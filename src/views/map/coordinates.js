@@ -13,7 +13,7 @@ const Coordinates = observer(() =>
     { [ 'lat', 'lng' ].map((direction, idx) =>
       <div key={ idx } className='pull-xs-left'>
         <div className='input-group'>
-          <span className='input-group-addon' id='basic-addon1'>
+          <span className='input-group-text' id='basic-addon1'>
             { direction }
           </span>
           <input

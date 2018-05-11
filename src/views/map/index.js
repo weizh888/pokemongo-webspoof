@@ -177,7 +177,7 @@ class Map extends Component {
 
         <div className='goto'>
           <div className='input-group'>
-            <span className='input-group-addon' id='basic-addon-goto'>loc</span>
+            <span className='input-group-text' id='basic-addon-goto'>loc</span>
             <input id='goto-loc' type='text' className='form-control' aria-describedby='basic-addon-goto' />
           </div>
           <div>
