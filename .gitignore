@@ -66,3 +66,9 @@ fastlane/screenshots
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+/libs/
+/temp/
+/.project
+/build.xml
+/package-lock.json
+/package.json.OK
