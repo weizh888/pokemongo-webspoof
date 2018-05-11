@@ -52,7 +52,13 @@ static NSString * const kURLScheme = @"com.googleusercontent.apps.848232511240-d
 - (IBAction)launchPokemonGo:(id)sender {
     
     if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kURLScheme]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLScheme]];
+        // before IOS 10 :
+        //[[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLScheme]];
+        // IOS 10 :
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kURLScheme] options:@{}
+                                 completionHandler:^(BOOL success) {
+                                     // rien a faire
+                                 }];
     }
 }
 
