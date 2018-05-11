@@ -1,5 +1,5 @@
 import { last, omit } from 'lodash'
-import { observable, action, computed } from 'mobx'
+import { observable, action, computed, decorate } from 'mobx'
 import haversine from 'haversine'
 
 import { updateXcodeLocation } from './settings.js'
@@ -8,11 +8,11 @@ class Stats {
 
   timeout = null
 
-  @observable totalDistance = 0
-  @observable lastLocation = null
-  @observable lastMoves = []
+  totalDistance = 0
+  lastLocation = null
+  lastMoves = []
 
-  @computed get speed() {
+  get speed() {
     // we must have at least 2 points to get an average speed
     if (this.lastMoves.length < 2) return 0
 
@@ -33,7 +33,7 @@ class Stats {
     return lastMovesDistance / lastMovesTime
   }
 
-  @action pushMove = (latitude, longitude) => {
+  pushMove = (latitude, longitude) => {
     // dont reset `this.lastMoves` we have received a new location
     if (this.timeout) {
       clearTimeout(this.timeout)
@@ -54,10 +54,18 @@ class Stats {
     this.timeout = setTimeout(this.clearMoves, 2500)
   }
 
-  @action clearMoves = () => {
+  clearMoves = () => {
     this.lastMoves.clear()
   }
 
 }
+decorate(Stats, {
+    totalDistance: observable,
+    lastLocation: observable,
+    lastMoves: observable,
+    speed: computed,
+    pushMove: action,
+    clearMoves: action
+})
 
 export default new Stats()

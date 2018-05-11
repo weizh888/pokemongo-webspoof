@@ -22,7 +22,7 @@
     box-shadow: 0 0 7px rgba(0, 0, 0, .3);
     display: none;
     position: absolute;
-    padding: 10px;
+    padding: 10px 25px 10px 25px;
     top: calc(50vh - (420px / 2) - $navbar-height);
     left: calc(50vw - (600px / 2));
     width: 600px;
@@ -37,11 +37,17 @@
 
       &.selected {
         border: 1px solid #0275d8 !important;
+        background-color: #edf3ff !important;
       }
 
       .fa {
-        font-size: 60px;
+        font-size: 32px;
+        margin-top: 5px;
         margin-bottom: 10px;
+      }
+
+      .desc {
+        margin: 0px 10px;
       }
     }
 

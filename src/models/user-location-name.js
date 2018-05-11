@@ -5,7 +5,7 @@ import Alert from 'react-s-alert'
 import userLocation from './user-location.js'
 
 const geocoder = window.require('geocoder')
-const userLocatioName = observable('Unknown')
+const userLocatioName = observable.box('Unknown')
 
 const reverseLocation = throttle(([ lat, lng ]) => {
   if (lat && lng) {

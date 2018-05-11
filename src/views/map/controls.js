@@ -7,7 +7,7 @@ import cx from 'classnames'
 import userLocation from '../../models/user-location.js'
 import settings from '../../models/settings.js'
 
-const lastMoveDirection = observable(null)
+const lastMoveDirection = observable.box(null)
 
 const handleMove = action((direction) => {
   const speedCoeff = settings.speedLimit.get()

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import React, { Component } from 'react'
 import GoogleMap from 'google-map-react'
-import { observable, action, toJS } from 'mobx'
+import { observable, action, toJS, decorate } from 'mobx'
 import { observer } from 'mobx-react'
 import Alert from 'react-s-alert'
 
@@ -18,12 +18,15 @@ import TotalDistance from './total-distance.js'
 import Autopilot from './autopilot.js'
 import Pokeball from './pokeball.js'
 
+const {clipboard} = window.require('electron')
+const {dialog} = window.require('electron').remote
+
 @observer
 class Map extends Component {
 
   map = null
 
-  @observable mapOptions = {
+  mapOptions = {
     keyboardShortcuts: false,
     draggable: true
   }
@@ -60,19 +63,67 @@ class Map extends Component {
     }
   }
 
-  @action handleGeolocationSuccess({ coords: { latitude, longitude } }) {
+  handleGeolocationSuccess({ coords: { latitude, longitude } }) {
     userLocation.replace([ latitude, longitude ])
   }
 
-  @action toggleMapDrag = () => {
+  toggleMapDrag = () => {
     this.mapOptions.draggable = !this.mapOptions.draggable
     this.map.map_.setOptions(toJS(this.mapOptions))
   }
 
-  @action handleClick = ({ lat, lng }, force) => {
+  handleClick = ({ lat, lng }, force) => {
     if (!this.mapOptions.draggable || force) {
       this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
     }
+  }
+
+  // Perso (copy/paste coordinates as 48.5,2.35)
+  handlePasteClick = event => {
+    var value = clipboard.readText();
+    value = value.replace('https://maps.google.com/maps?q=', '');
+    value = value.replace('https://www.google.com/maps?q=', '');
+    value = value.replace(' ', '');
+    value = value.replace(';', ',');
+    //https://maps.google.com/maps?q=51.49911683,-0.00773988
+    //https://www.google.com/maps/place/51%C2%B029'56.8%22N+0%C2%B000'27.9%22W/@51.4991168,-0.0099286,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d51.4991168!4d-0.0077399
+    var element = document.getElementById('goto-loc');
+    if (element.value === value) {
+      return;
+    }
+    element.setAttribute("data-previous-location", element.value);
+    element.value = value;
+  }
+  handleGotoClick = event => {
+    const loc = document.getElementById('goto-loc').value;
+    const [ lat, lng ] = loc.split(',').map(coord => parseFloat(coord));
+    const choice = dialog.showMessageBox(
+         {
+            type: 'question',
+            buttons: ['Yes', 'No'],
+            title: 'Confirm',
+            message: 'Going to lat: ' + lat + ', lng: ' + lng + ' ?'
+         });
+    if (choice == 0) {
+      this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } });
+    }
+  }
+  handleBackClick = event => {
+    var element = document.getElementById('goto-loc');
+    var value = element.getAttribute("data-previous-location");
+    if (value != null) {
+      element.value = value;
+    }
+  }
+  handleCurrentClick = event => {
+    var element = document.getElementById('goto-loc'),
+        value = userLocation[0] + ',' + userLocation[1];
+    if (element.value === value) {
+      return;
+    }
+    clipboard.writeText(value);
+    element.setAttribute("data-previous-location", element.value);
+    element.value = value;
   }
 
   render() {
@@ -89,7 +140,11 @@ class Map extends Component {
             onClick={ this.handleClick }
             options={ () => this.mapOptions }
             onGoogleApiLoaded={ this.handleGoogleMapLoaded }
-            yesIWantToUseGoogleMapApiInternals={ true }>
+            yesIWantToUseGoogleMapApiInternals={ true }
+            bootstrapURLKeys={{
+                key: settings.googleAPIKey.get(),
+                language: 'en'
+            }}>
             { /* userlocation center */ }
             <Pokeball lat={ userLocation[0] } lng={ userLocation[1] } />
           </GoogleMap> :
@@ -120,6 +175,21 @@ class Map extends Component {
             </div> }
         </div>
 
+        <div className='goto'>
+          <div className='input-group'>
+            <span className='input-group-addon' id='basic-addon-goto'>loc</span>
+            <input id='goto-loc' type='text' className='form-control' aria-describedby='basic-addon-goto' />
+          </div>
+          <div>
+            <span className='btn btn-primary btn-sm' onClick={ this.handlePasteClick }>Paste</span>
+            <span className='btn btn-primary btn-sm' onClick={ this.handleGotoClick }>Goto</span>
+            <span className='btn btn-primary btn-sm' onClick={ this.handleBackClick }>Back</span>
+          </div>
+          <div>
+            <span className='btn btn-primary btn-sm' onClick={ this.handleCurrentClick }>Current</span>
+          </div>
+        </div>
+
         { /* controls, settings displayed on top of the map */ }
         <Coordinates />
         <SpeedCounter />
@@ -132,4 +202,15 @@ class Map extends Component {
     )
   }
 }
+decorate(Map, {
+    mapOptions: observable,
+    handleGeolocationSuccess: action,
+    toggleMapDrag: action,
+    handleClick: action,
+    handlePasteClick: action,
+    handleGotoClick: action,
+    handleBackClick: action,
+    handleCurrentClick: action
+})
+
 export default Map

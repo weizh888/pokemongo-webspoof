@@ -1,5 +1,5 @@
 import { times } from 'lodash'
-import { action, observable, computed } from 'mobx'
+import { action, observable, computed, decorate } from 'mobx'
 import haversine from 'haversine'
 import Alert from 'react-s-alert'
 
@@ -9,15 +9,15 @@ class Autopilot {
 
   timeout = null // inner setTimout to move next location
 
-  @observable paused = false
-  @observable running = false // is the autopilot running
-  @observable steps = []
-  @observable speed = 9 / 3600 // 0.0025 ~= 2,5m/s ~= 9 km/h
-  @observable distance = 0 // remaining distance to arrival in km
-  @observable rawOverviewPath = null // save last query to re-calculate optimized route
-  @observable destination = { lat: null, lng: null };
+  paused = false
+  running = false // is the autopilot running
+  steps = []
+  speed = 9 / 3600 // 0.0025 ~= 2,5m/s ~= 9 km/h
+  distance = 0 // remaining distance to arrival in km
+  rawOverviewPath = null // save last query to re-calculate optimized route
+  destination = { lat: null, lng: null };
 
-  @computed get accurateSteps() {
+  get accurateSteps() {
     if (this.rawOverviewPath) {
       const { steps } = this.calculateIntermediateSteps(this.rawOverviewPath)
       return steps
@@ -26,11 +26,11 @@ class Autopilot {
     }
   }
 
-  @computed get clean() {
+  get clean() {
     return !this.running && !this.paused
   }
 
-  @computed get time() {
+  get time() {
     const speed = this.speed * 3600 // to km/h
     const hours = Math.floor(this.distance / speed)
     const minutes = Math.floor(((this.distance / speed) * 60) % 60)
@@ -115,7 +115,7 @@ class Autopilot {
       { distance: 0, steps: [] }
     )
 
-  @action scheduleTrip = async (lat, lng) => {
+  scheduleTrip = async (lat, lng) => {
     try {
       const foundPath = await this.findDirectionPath(lat, lng)
       const { distance } = this.calculateIntermediateSteps(foundPath)
@@ -157,7 +157,7 @@ class Autopilot {
     moveNextPoint()
   }
 
-  @action pause = () => {
+  pause = () => {
     clearTimeout(this.timeout)
     this.timeout = null
     this.running = false
@@ -165,7 +165,7 @@ class Autopilot {
   }
 
   // reset all store state
-  @action stop = () => {
+  stop = () => {
     clearTimeout(this.timeout)
     this.timeout = null
     this.paused = false
@@ -175,5 +175,22 @@ class Autopilot {
   }
 
 }
+decorate(Autopilot, {
+    paused: observable,
+    running: observable,
+    steps: observable,
+    speed: observable,
+    distance: observable,
+    rawOverviewPath: observable,
+    destination: observable,
+    
+    accurateSteps: computed,
+    clean: computed,
+    time: computed,
+    
+    scheduleTrip: action,
+    pause: action,
+    stop: action
+})
 
 export default new Autopilot()

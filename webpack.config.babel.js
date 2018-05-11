@@ -1,13 +1,15 @@
 import webpack from 'webpack'
 
-export default {
+const path = require('path');
+
+module.exports = (env, argv) => ({
   entry: [
     'babel-polyfill',
     './src/index.js'
   ],
 
   output: {
-    path: './dist',
+    path: path.resolve(__dirname, "dist"),
     filename: 'index.js',
     chunkFilename: '[name].js'
   },
@@ -15,49 +17,26 @@ export default {
   module: {
     rules: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
-      { test: /\.css$/, loader: 'style-loader!css-loader!postcss-loader' },
+      { test: /\.css$/, use: [
+                              { loader: 'style-loader' },
+                              { loader: 'css-loader' },
+                              { loader: 'postcss-loader', options: {
+                                  plugins: (loader) => [
+                                                        require('postcss-import'),
+                                                        require('precss'),
+                                                      ]
+                              } } ] },
       { test: /\.json$/, loader: 'json' }
     ]
   },
 
-  plugins: [
-    // https://github.com/postcss/postcss-loader/issues/99
-    new webpack.LoaderOptionsPlugin({
-      test: /\.css$/,
-      options: {
-        postcss: (webpackInstance) => [
-          require('postcss-import')({ addDependencyTo: webpackInstance }),
-          require('precss')()
-        ],
-        context: __dirname,
-      },
-    }),
-    ...process.env.NODE_ENV === 'production' ? [
-      new webpack.LoaderOptionsPlugin({ minimize: false, debug: false }),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          warnings: false,
-          screw_ie8: true,
-          sequences: true,
-          dead_code: true,
-          drop_debugger: true,
-          comparisons: true,
-          conditionals: true,
-          evaluate: true,
-          booleans: true,
-          loops: true,
-          unused: true,
-          hoist_funs: true,
-          if_return: true,
-          join_vars: true,
-          cascade: true,
-          drop_console: true
-        },
-        output: {
-          comments: false
-        }
-      })
-    ] : [],
-  ]
-}
+  optimization: {
+    minimize: argv.mode === 'production'
+  },
+
+  performance: {
+    maxEntrypointSize: argv.mode === 'production' ? 670000 : 1340000, /* default 250000 */
+    maxAssetSize: argv.mode === 'production' ? 670000 : 1340000       /* default 250000 */
+  }
+
+})

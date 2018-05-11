@@ -1,7 +1,7 @@
 import { capitalize } from 'lodash'
 
 import React, { Component } from 'react'
-import { action, observable, computed } from 'mobx'
+import { action, observable, computed, decorate } from 'mobx'
 import { observer } from 'mobx-react'
 import places from 'places.js'
 import cx from 'classnames'
@@ -11,29 +11,34 @@ import autopilot from '../../models/autopilot.js'
 const travelModes = [
   [ 'walk', 9, 'street-view' ],
   [ 'cycling', 13, 'bicycle' ], // Credit to https://github.com/DJLectr0
+  [ 'moto', 22, 'motorcycle' ],
   [ 'subway', 50, 'subway' ],
   [ 'truck', 80, 'truck' ],
-  [ 'car', 120, 'car' ],
+  [ 'bus', 95, 'car' ],
+  [ 'car', 115, 'car' ],
+  [ 'rocket', 170, 'rocket' ],
+  [ 'tgv', 360, 'train' ],
+  [ 'plane', 940, 'plane' ],
   [ 'teleport', '~', 'star' ]
 ]
 
 @observer
 class Autopilot extends Component {
 
-  @observable isModalOpen = false
-  @observable travelMode = 'walk'
+  isModalOpen = false
+  travelMode = 'walk'
 
-  @computed get speed() {
+  get speed() {
     const [ , speed ] = travelModes.find(([ t ]) => t === this.travelMode)
     return speed
   }
 
-  @computed get travelModeName() {
+  get travelModeName() {
     const [ travelModeName ] = travelModes.find(([ t ]) => t === this.travelMode)
     return travelModeName
   }
 
-  @computed get travelModeIcon() {
+  get travelModeIcon() {
     const [ , , travelModeIcon ] = travelModes.find(([ t ]) => t === this.travelMode)
     return travelModeIcon
   }
@@ -58,12 +63,12 @@ class Autopilot extends Component {
     })
   }
 
-  @action handleSuggestionChange = ({ suggestion: { latlng: { lat, lng } } }) =>
+  handleSuggestionChange = ({ suggestion: { latlng: { lat, lng } } }) =>
     autopilot.scheduleTrip(lat, lng)
       .then(() => { if (!this.isModalOpen) this.isModalOpen = true })
       .catch(() => this.placesAutocomplete.setVal(null))
 
-  @action handleStartAutopilot = () => {
+  handleStartAutopilot = () => {
     // reset modal state
     this.placesAutocomplete.setVal(null)
 
@@ -75,18 +80,18 @@ class Autopilot extends Component {
     this.isModalOpen = false
   }
 
-  @action handleCancelAutopilot = () => {
+  handleCancelAutopilot = () => {
     // reset modal state
     this.placesAutocomplete.setVal(null)
     this.isModalOpen = false
   }
 
-  @action handleSelectTravelMode = (name, speed) => () => {
+  handleSelectTravelMode = (name, speed) => () => {
     autopilot.speed = speed / 3600
     this.travelMode = name
   }
 
-  @action handleChangeSpeed = () => {
+  handleChangeSpeed = () => {
     const { destination: { lat, lng } } = autopilot
 
     autopilot.pause()
@@ -215,5 +220,17 @@ class Autopilot extends Component {
   }
 
 }
+decorate(Autopilot, {
+    isModalOpen: observable,
+    travelMode: observable,
+    speed: computed,
+    travelModeName: computed,
+    travelModeIcon: computed,
+    handleSuggestionChange: action,
+    handleStartAutopilot: action,
+    handleCancelAutopilot: action,
+    handleSelectTravelMode: action,
+    handleChangeSpeed: action
+})
 
 export default Autopilot
