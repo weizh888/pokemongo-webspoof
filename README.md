@@ -73,6 +73,10 @@ Happy hacking 👍
 `Xcode can attempt to fix this issue. This will reset your code signing and provisioning settings to recommended values and` `resolve issues with signing identities and provisioning profiles."`
 * https://github.com/iam4x/pokemongo-webspoof/issues/16#issuecomment-233197020
 
+## TODO
+
+* Wait for a version of the google-map-react package greater than 1.0.1 that resolves the mouse pointer problem, which remains stuck in "Draggable" mode.
+
 ## Credits
 
 * [Pokemon-Go-Controller](https://github.com/kahopoon/Pokemon-Go-Controller) for first proof of concept
