@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import React, { Component } from 'react'
-import GoogleMap from 'google-map-react'
+import GoogleMapReact from 'google-map-react'
 import { observable, action, toJS, decorate } from 'mobx'
 import { observer } from 'mobx-react'
 import Alert from 'react-s-alert'
@@ -28,7 +28,9 @@ class Map extends Component {
 
   mapOptions = {
     keyboardShortcuts: false,
-    draggable: true
+    draggable: true,
+    draggableCursor: 'default', // workaround for cursor using 'google-map-react' >= 1.0.0
+    draggingCursor: 'move'
   }
 
   componentWillMount() {
@@ -133,7 +135,7 @@ class Map extends Component {
       <div className='google-map-container'>
         { /* only display google map when user geolocated */ }
         { (latitude && longitude) ?
-          <GoogleMap
+          <GoogleMapReact
             ref={ (ref) => { this.map = ref } }
             zoom={ settings.zoom.get() }
             center={ [ latitude, longitude ] }
@@ -147,7 +149,7 @@ class Map extends Component {
             }}>
             { /* userlocation center */ }
             <Pokeball lat={ userLocation[0] } lng={ userLocation[1] } />
-          </GoogleMap> :
+          </GoogleMapReact> :
           <div
             style={ {
               position: 'absolute',
