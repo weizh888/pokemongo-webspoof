@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import React, { Component } from 'react'
-import GoogleMapReact from 'google-map-react'
+import GoogleMap from 'google-map-react'
 import { observable, action, toJS, decorate } from 'mobx'
 import { observer } from 'mobx-react'
 import Alert from 'react-s-alert'
@@ -27,10 +27,14 @@ class Map extends Component {
   map = null
 
   mapOptions = {
-    keyboardShortcuts: false,
     draggable: true,
     draggableCursor: 'default', // workaround for cursor using 'google-map-react' >= 1.0.0
-    draggingCursor: 'move'
+    draggingCursor: 'move',
+    fullscreenControl: false,
+    keyboardShortcuts: false,
+    minZoom: 2,
+    maxZoom: 20,
+    resetBoundsOnResize: false
   }
 
   componentWillMount() {
@@ -74,10 +78,35 @@ class Map extends Component {
     this.map.map_.setOptions(toJS(this.mapOptions))
   }
 
-  handleClick = ({ lat, lng }, force) => {
-    if (!this.mapOptions.draggable || force) {
+  handleGoogleMapClick = ({x, y, lat, lng, event}, force) => {
+    console.log('==> handleMapClick(..) : ' + lat + ',' + lng + ' (x=' + x + ',y=' + y + ')');
+// GoogleMapReact 1.0.5 patch
+//    if (!this.mapOptions.draggable || force) {
+//      this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
+//    }
+  }
+
+  // GoogleMapReact 1.0.5 patch
+  handleMapClick2 = ({x, y, lat, lng}) => {
+    console.log('==> handleMapClick2(..) : ' + lat + ',' + lng + ' (x=' + x + ',y=' + y + ')');
+    if (!this.mapOptions.draggable) {
       this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
     }
+  }
+
+  handleGoogleMapChange = ({ center, zoom, bounds, marginBounds, size }) => {
+//    console.log('==> handleGoogleMapChange(..) : center=' + JSON.stringify(center));
+//    console.log('==> handleGoogleMapChange(..) : zoom=' + zoom);
+//    console.log('==> handleGoogleMapChange(..) : bounds=' + JSON.stringify(bounds));
+//    console.log('==> handleGoogleMapChange(..) : marginBounds=' + JSON.stringify(marginBounds));
+//    console.log('==> handleGoogleMapChange(..) : size=' + JSON.stringify(size));
+  }
+
+  handleGoogleApiLoaded = ({ map, maps }) => {
+    // GoogleMapReact 1.0.5 patch
+    map.addListener('click', event => {
+      this.handleMapClick2({'x': event.pixel.x, 'y': event.pixel.y, 'lat': event.latLng.lat(), 'lng': event.latLng.lng()}); 
+    });
   }
 
   // Perso (copy/paste coordinates as 48.5,2.35)
@@ -135,13 +164,14 @@ class Map extends Component {
       <div className='google-map-container'>
         { /* only display google map when user geolocated */ }
         { (latitude && longitude) ?
-          <GoogleMapReact
+          <GoogleMap
             ref={ (ref) => { this.map = ref } }
             zoom={ settings.zoom.get() }
             center={ [ latitude, longitude ] }
-            onClick={ this.handleClick }
+            onClick={ this.handleGoogleMapClick }
+            onChange={ this.handleGoogleMapChange }
             options={ () => this.mapOptions }
-            onGoogleApiLoaded={ this.handleGoogleMapLoaded }
+            onGoogleApiLoaded={ this.handleGoogleApiLoaded }
             yesIWantToUseGoogleMapApiInternals={ true }
             bootstrapURLKeys={{
                 key: settings.googleAPIKey.get(),
@@ -149,7 +179,7 @@ class Map extends Component {
             }}>
             { /* userlocation center */ }
             <Pokeball lat={ userLocation[0] } lng={ userLocation[1] } />
-          </GoogleMapReact> :
+          </GoogleMap> :
           <div
             style={ {
               position: 'absolute',
@@ -208,7 +238,6 @@ decorate(Map, {
     mapOptions: observable,
     handleGeolocationSuccess: action,
     toggleMapDrag: action,
-    handleClick: action,
     handlePasteClick: action,
     handleGotoClick: action,
     handleBackClick: action,
