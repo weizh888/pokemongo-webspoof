@@ -79,20 +79,19 @@ class Map extends Component {
   }
 
   handleGoogleMapClick = ({x, y, lat, lng, event}, force) => {
-    console.log('==> handleMapClick(..) : ' + lat + ',' + lng + ' (x=' + x + ',y=' + y + ')');
-// GoogleMapReact 1.0.5 patch
-//    if (!this.mapOptions.draggable || force) {
-//      this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
-//    }
+    //console.log('==> handleMapClick(..) : ' + lat + ',' + lng + ' (x=' + x + ',y=' + y + ')');
+    if (!this.mapOptions.draggable || force) {
+      this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
+    }
   }
 
-  // GoogleMapReact 1.0.5 patch
+  /* GoogleMapReact 1.0.5 patch
   handleMapClick2 = ({x, y, lat, lng}) => {
     console.log('==> handleMapClick2(..) : ' + lat + ',' + lng + ' (x=' + x + ',y=' + y + ')');
     if (!this.mapOptions.draggable) {
       this.autopilot.handleSuggestionChange({ suggestion: { latlng: { lat, lng } } })
     }
-  }
+  }*/
 
   handleGoogleMapChange = ({ center, zoom, bounds, marginBounds, size }) => {
 //    console.log('==> handleGoogleMapChange(..) : center=' + JSON.stringify(center));
@@ -103,10 +102,10 @@ class Map extends Component {
   }
 
   handleGoogleApiLoaded = ({ map, maps }) => {
-    // GoogleMapReact 1.0.5 patch
+    /* GoogleMapReact 1.0.5 patch
     map.addListener('click', event => {
       this.handleMapClick2({'x': event.pixel.x, 'y': event.pixel.y, 'lat': event.latLng.lat(), 'lng': event.latLng.lng()}); 
-    });
+    });*/
   }
 
   // Perso (copy/paste coordinates as 48.5,2.35)
