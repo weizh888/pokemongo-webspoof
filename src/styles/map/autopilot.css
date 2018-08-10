@@ -51,6 +51,10 @@
       }
     }
 
+    span.tag-info {
+      padding-right: 5px;
+    }
+
     button {
       margin-top: 20px;
     }
