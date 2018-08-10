@@ -5,7 +5,7 @@ import { speed } from '../../models/stats.js'
 
 const SpeedCounter = observer(() =>
   <span className='speed'>
-    { speed.toFixed(1) } km/h
+    { speed.toFixed(2) } km/h
   </span>
 )
 
