@@ -7,6 +7,8 @@ const tryCatch = require('./src/try-catch')
 const { app } = electron
 const { BrowserWindow } = electron
 
+const runXCode = true;
+
 // enable chrome dev-tools when builded
 // require('electron-debug')({ enabled: true, showDevTools: true })
 
@@ -35,13 +37,16 @@ app.on('ready', () => {
     global.tmpProjectPath = path
     createWindow()
 
-    execSync(`cp -R ${resolve(__dirname, 'xcode-project')} ${resolve(path)}`)
-    execSync(`open ${resolve(path, 'xcode-project/pokemon-webspoof.xcodeproj')}`)
-
+    if (runXCode) {
+      execSync(`cp -R ${resolve(__dirname, 'xcode-project')} ${resolve(path)}`)
+      execSync(`open ${resolve(path, 'xcode-project/pokemon-webspoof.xcodeproj')}`)
+    }
     // quit xcode && remove tmp directory on exit
     app.on('before-quit', () => {
-      tryCatch(() => execSync('killall Xcode'))
-      tryCatch(() => execSync(`rm -rf ${path}`))
+      if (runXCode) {
+        tryCatch(() => execSync('killall Xcode'))
+        tryCatch(() => execSync(`rm -rf ${path}`))
+      }
     })
   })
 })
