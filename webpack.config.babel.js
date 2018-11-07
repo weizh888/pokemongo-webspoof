@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = (env, argv) => ({
   entry: [
-    'babel-polyfill',
+    '@babel/polyfill',
     './src/index.js'
   ],
 
