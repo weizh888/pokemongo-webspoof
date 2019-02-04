@@ -2,7 +2,6 @@ import { times } from 'lodash'
 import { action, observable, computed, decorate } from 'mobx'
 import haversine from 'haversine'
 import Alert from 'react-s-alert'
-
 import userLocation from './user-location.js'
 
 class Autopilot {
@@ -66,7 +65,6 @@ class Autopilot {
         this.rawOverviewPath = overview_path
         return resolve(overview_path)
       }
-
       this.rawOverviewPath = null
       return reject(status)
     })
@@ -77,7 +75,6 @@ class Autopilot {
       (result, { lat: endLat, lng: endLng }, idx) => {
         if (idx > 0) {
           const { lat: startLat, lng: startLng } = foundPath[idx - 1]
-
           const pendingDistance = haversine(
             { latitude: startLat(), longitude: startLng() },
             { latitude: endLat(), longitude: endLng() }
@@ -92,19 +89,15 @@ class Autopilot {
 
           // 0.0025 ~= 2,5m/s ~= 9 km/h
           const splitInto = (pendingDistance / this.speed).toFixed()
-
           const latSteps = (Math.abs(startLat() - endLat())) / splitInto
           const lngSteps = (Math.abs(startLng() - endLng())) / splitInto
-
           const stepsInBetween = times(splitInto, (step) => {
             const calculatedLat = (startLat() > endLat()) ?
               startLat() - (latSteps * step) : startLat() + (latSteps * step)
             const calculatedLng = (startLng() > endLng()) ?
               startLng() - (lngSteps * step) : startLng() + (lngSteps * step)
-
             return { lat: calculatedLat, lng: calculatedLng }
           })
-
           return {
             distance: result.distance + pendingDistance,
             steps: [ ...result.steps, ...stepsInBetween ]
@@ -126,7 +119,6 @@ class Autopilot {
         <strong>Error with schedule trip</strong>
         <div class='stack'>${error}</div>
       `)
-
       throw error
     }
   }
@@ -153,7 +145,6 @@ class Autopilot {
         }
       }
     })
-
     moveNextPoint()
   }
 
@@ -173,7 +164,6 @@ class Autopilot {
     this.distance = 0
     this.steps.clear()
   }
-
 }
 decorate(Autopilot, {
     paused: observable,

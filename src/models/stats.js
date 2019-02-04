@@ -57,7 +57,6 @@ class Stats {
   clearMoves = () => {
     this.lastMoves.clear()
   }
-
 }
 decorate(Stats, {
     totalDistance: observable,

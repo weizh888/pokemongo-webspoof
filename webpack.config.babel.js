@@ -1,6 +1,5 @@
 import webpack from 'webpack'
-
-const path = require('path');
+const Path = require('path')
 
 module.exports = (env, argv) => ({
   entry: [
@@ -9,7 +8,7 @@ module.exports = (env, argv) => ({
   ],
 
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: Path.resolve(__dirname, 'dist'),
     filename: 'index.js',
     chunkFilename: '[name].js'
   },

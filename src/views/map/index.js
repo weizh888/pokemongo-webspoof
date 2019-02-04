@@ -18,6 +18,8 @@ import TotalDistance from './total-distance.js'
 import Autopilot from './autopilot.js'
 import Pokeball from './pokeball.js'
 
+import MapsApi from '../../config/api.js'
+
 const {clipboard} = window.require('electron')
 const {dialog} = window.require('electron').remote
 
@@ -173,7 +175,7 @@ class Map extends Component {
             onGoogleApiLoaded={ this.handleGoogleApiLoaded }
             yesIWantToUseGoogleMapApiInternals={ true }
             bootstrapURLKeys={{
-                key: settings.googleAPIKey.get(),
+                key: MapsApi.apiKey,
                 language: 'en'
             }}>
             { /* userlocation center */ }
