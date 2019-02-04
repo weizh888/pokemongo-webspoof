@@ -8,7 +8,7 @@
     "lint": "eslint src",
     "clean": "rm -rf ./dist/* ./pokemongo-webspoof-darwin-x64 ./pokemongo-webspoof.zip",
     "build:code": "webpack --config webpack.config.babel.js --mode production",
-    "build:electron": "electron-packager . pokemongo-webspoof --platform=darwin --arch=x64",
+    "build:electron": "electron-packager . pokemongo-webspoof --platform=darwin --arch=x64 --ignore=/temp/ --ignore=/.settings/ --ignore=/.project  --ignore=/build.xml",
     "open:app": "open ./pokemongo-webspoof-darwin-x64/pokemongo-webspoof.app",
     "archive:app": "tar czf pokemongo-webspoof.app.tar.gz ./pokemongo-webspoof-darwin-x64/pokemongo-webspoof.app",
     "build": "npm run clean && npm run build:code && npm run build:electron && npm run archive:app"

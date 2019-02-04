@@ -4,4 +4,7 @@
 index.html
 pokeball.png
 webpack.config.babel.js
-src
+src/
+temp/
+.project
+build.xml
