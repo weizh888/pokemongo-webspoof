@@ -114,11 +114,12 @@ class Map extends Component {
   handlePasteClick = event => {
     var value = clipboard.readText();
     value = value.replace('https://maps.google.com/maps?q=', '');
+    value = value.replace('http://maps.google.com/maps?q=', '');
     value = value.replace('https://www.google.com/maps?q=', '');
+    value = value.replace('http://www.google.com/maps?q=', '');
+    value = value.replace('https://www.google.com/maps/?daddr=', '');
     value = value.replace(' ', '');
     value = value.replace(';', ',');
-    //https://maps.google.com/maps?q=51.49911683,-0.00773988
-    //https://www.google.com/maps/place/51%C2%B029'56.8%22N+0%C2%B000'27.9%22W/@51.4991168,-0.0099286,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d51.4991168!4d-0.0077399
     var element = document.getElementById('goto-loc');
     if (element.value === value) {
       return;
