@@ -11,7 +11,7 @@ class Autopilot {
   paused = false
   running = false // is the autopilot running
   steps = []
-  speed = 9 / 3600 // 0.0025 ~= 2,5m/s ~= 9 km/h
+  speed = NaN  // 9 / 3600 // 0.0025 ~= 2,5m/s ~= 9 km/h
   distance = 0 // remaining distance to arrival in km
   rawOverviewPath = null // save last query to re-calculate optimized route
   destination = { lat: null, lng: null };
@@ -48,6 +48,11 @@ class Autopilot {
   findDirectionPath = (lat, lng) => new Promise((resolve, reject) => {
     const { google: { maps } } = window
     this.destination = { lat, lng }
+    if (isNaN(this.speed)) {
+      this.rawOverviewPath = [{ lat: () => userLocation[0], lng: () => userLocation[1] },
+        { lat: () => lat, lng: () => lng }]
+      return resolve(this.rawOverviewPath)
+    }
 
     // prepare `directionsRequest` to google map
     const directionsService = new maps.DirectionsService()
@@ -173,11 +178,11 @@ decorate(Autopilot, {
     distance: observable,
     rawOverviewPath: observable,
     destination: observable,
-    
+
     accurateSteps: computed,
     clean: computed,
     time: computed,
-    
+
     scheduleTrip: action,
     pause: action,
     stop: action

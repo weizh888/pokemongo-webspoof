@@ -26,7 +26,7 @@ const travelModes = [
 class Autopilot extends Component {
 
   isModalOpen = false
-  travelMode = 'walk'
+  travelMode = 'teleport'
 
   get speed() {
     const [ , speed ] = travelModes.find(([ t ]) => t === this.travelMode)
